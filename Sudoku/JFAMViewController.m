@@ -22,7 +22,6 @@ int initialGrid[9][9] = {
 
 @interface JFAMViewController ()
 {
-    UIButton* _button;
     UIButton* _buttonArray[9][9];
 }
 @end
@@ -37,17 +36,6 @@ int initialGrid[9][9] = {
     CGRect frame = self.view.frame;
     CGFloat size = MIN(CGRectGetWidth(frame), CGRectGetHeight(frame));
     
-//    CGRect buttonFrame = CGRectMake(0, 0, size*0.5, size*0.5);
-//    
-//    _button = [[UIButton alloc] initWithFrame:buttonFrame];
-//    _button.tag = 1;
-//    _button.backgroundColor = [UIColor redColor];
-//    _button.showsTouchWhenHighlighted = YES;
-//    
-//    [self.view addSubview:_button];
-//    
-//    [_button addTarget:self action:@selector(buttonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    
     // Create a black background for the borders of the grid
     
     CGFloat backgroundSize = 0.9 * size;
@@ -59,29 +47,37 @@ int initialGrid[9][9] = {
     background.backgroundColor = [UIColor blackColor];
     [self.view addSubview:background];
     
-    // Create all the buttons
-    CGFloat buttonSize = backgroundSize/9-18;
+    // Variables for button creation
+    CGFloat buttonSize = 4*backgroundSize/50;
     CGRect buttonFrame;
-//
-//    buttonFrame = CGRectMake(0, 0, buttonSize, buttonSize);
-//    
-//    _button = [[UIButton alloc] initWithFrame:buttonFrame];
-//    _button.tag = 1;
-//    _button.backgroundColor = [UIColor redColor];
-//    _button.showsTouchWhenHighlighted = YES;
+    int colThick, colThin, rowThick, rowThin;
+    CGFloat xPos, yPos;
+    UIButton* currentButton;
+    NSString* number;
     
-    [background addSubview:_button];
     for (int row=0; row<9; row++) {
         for (int col=0; col<9; col++) {
-            buttonFrame = CGRectMake(col*(buttonSize+2), row*(buttonSize+2), buttonSize, buttonSize);
-            UIButton* currentButton = _buttonArray[row][col];
+            // Position and make the buttons
+            colThick = 1+col/3;
+            colThin = col+1 - colThick;
+            rowThick = 1+row/3;
+            rowThin = row+1 - rowThick;
+            xPos = col*buttonSize + colThick*buttonSize/2 + colThin*buttonSize/4;
+            yPos = row*buttonSize + rowThick*buttonSize/2 + rowThin*buttonSize/4;
+            buttonFrame = CGRectMake(xPos, yPos, buttonSize, buttonSize);
+            // Set attributes of each button
+            currentButton = _buttonArray[row][col];
             currentButton = [[UIButton alloc] initWithFrame:buttonFrame];
-            currentButton.tag = 10*row+col;
-            currentButton.backgroundColor = [UIColor whiteColor];
-            NSString* number = [NSString stringWithFormat:@"%d", initialGrid[row][col]];
+            currentButton.tag = 10*(row+1)+col+1;
+            currentButton.backgroundColor = [UIColor colorWithWhite:230/255.0 alpha:1.0];
+            currentButton.showsTouchWhenHighlighted = YES;
+            // Decide what to display on each button
+            number = [NSString stringWithFormat:@"%d", initialGrid[row][col]];
+            if ([number  isEqual: @"0"]) number = @"";
             [currentButton setTitle:number forState:UIControlStateNormal];
             [currentButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-            currentButton.showsTouchWhenHighlighted = YES;
+            // Create button press event and add as a view
+            [currentButton addTarget:self action:@selector(buttonPressed:) forControlEvents:UIControlEventTouchUpInside];
             [background addSubview:currentButton];
         }
     }
@@ -96,7 +92,9 @@ int initialGrid[9][9] = {
 
 - (void) buttonPressed:(id)sender
 {
-    NSLog(@"Button 1 was pressed!!!!!!!!!!");
+    int row = ((UIButton*) sender).tag/10;
+    int col = ((UIButton*) sender).tag%10;
+    NSLog([NSString stringWithFormat:@"Button at row: %d and column: %d was pressed!", row, col]);
 }
 
 @end
